@@ -10,7 +10,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
 
 	
-public class NavigationLab {
+public class LocalizationLab {
 
   public static final double WHEEL_RADIUS = 2.1;            //Wheel radius (cm)
   public static final double TRACK = 15.0;                  //Wheel base length (cm)
@@ -39,6 +39,9 @@ public class NavigationLab {
 	//Create an instance of the US Poller, to take samples from the US sensor in a thread.	  
     UltrasonicPoller usPoller = new UltrasonicPoller(usDistance,usData);
     usPoller.start();
+    
+    UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer();
+    
 		  
     //Create an instance of the Nagivation class, used to guide the robot.
     final Navigation navigator = 
@@ -49,20 +52,30 @@ public class NavigationLab {
     }).start();
     do { 
       t.clear();	                           // Clear the display.
-      t.drawString("                ", 0, 0);  // Prompt user for input
-      t.drawString("  PRESS ENTER   ", 0, 1);
-      t.drawString("   TO BEGIN     ", 0, 2);
-      t.drawString("                ", 0, 3);
-      t.drawString("                ", 0, 4);
+      t.drawString("        |        ", 0, 0);  // Prompt user for input
+      t.drawString(" Falling| Rising ", 0, 1);
+      t.drawString("  Edge  |  Edge  ", 0, 2);
+      t.drawString("  <<<   |   >>>  ", 0, 3);
+      t.drawString("        |        ", 0, 4);
       
       buttonChoice = Button.waitForAnyPress(); //Wait for user input
-	} while (buttonChoice != Button.ID_ENTER); //Wait for the user to press enter.
-      if(buttonChoice == Button.ID_ENTER){
-        //Pressing Enter will cause the main operating threads to begin.
+	} while (buttonChoice != Button.ID_LEFT ||buttonChoice != Button.ID_RIGHT );
+      if(buttonChoice == Button.ID_LEFT){
 	    odometer.start();                  
 	    odometryDisplay.start();
 	    navigator.start();
+	    usLocalizer.setMode(1);
+	    usLocalizer.start();
+	    
 	    } 
+      if(buttonChoice == Button.ID_RIGHT){
+        odometer.start();                  
+        odometryDisplay.start();
+        navigator.start();
+        usLocalizer.setMode(2);
+        usLocalizer.start();
+        
+      }
         while (Button.waitForAnyPress() != Button.ID_ESCAPE);
         //The Program waits here, and exits if the user presses the escape button.
         System.exit(0);  
