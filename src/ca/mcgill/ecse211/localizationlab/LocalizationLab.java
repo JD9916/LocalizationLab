@@ -36,11 +36,13 @@ public class LocalizationLab {
     SampleProvider usDistance = usSensor.getMode("Distance"); 
     float[] usData = new float[usDistance.sampleSize()];
     
+    float localizationScan[] = new float[50];
+    
 	//Create an instance of the US Poller, to take samples from the US sensor in a thread.	  
-    UltrasonicPoller usPoller = new UltrasonicPoller(usDistance,usData);
+    UltrasonicPoller usPoller = new UltrasonicPoller(usDistance,usData, localizationScan);
     usPoller.start();
     
-    UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer();
+    UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(odometer,usPoller, localizationScan, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK );
     
 		  
     //Create an instance of the Nagivation class, used to guide the robot.
@@ -59,11 +61,11 @@ public class LocalizationLab {
       t.drawString("        |        ", 0, 4);
       
       buttonChoice = Button.waitForAnyPress(); //Wait for user input
-	} while (buttonChoice != Button.ID_LEFT ||buttonChoice != Button.ID_RIGHT );
+	} while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT );
       if(buttonChoice == Button.ID_LEFT){
-	    odometer.start();                  
-	    odometryDisplay.start();
-	    navigator.start();
+	    //odometer.start();                  
+	    //odometryDisplay.start();
+        t.clear();
 	    usLocalizer.setMode(1);
 	    usLocalizer.start();
 	    
@@ -71,7 +73,6 @@ public class LocalizationLab {
       if(buttonChoice == Button.ID_RIGHT){
         odometer.start();                  
         odometryDisplay.start();
-        navigator.start();
         usLocalizer.setMode(2);
         usLocalizer.start();
         

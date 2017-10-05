@@ -35,7 +35,13 @@ public class OdometryDisplay extends Thread {
       for (int i = 0; i < 3; i++) {
         t.drawString(formattedDoubleToString(position[i], 2), 3, i);
       }
-      System.out.println("         US: " + UltrasonicPoller.getDistance());
+      if(UltrasonicPoller.getDistance() > 250){
+        System.out.println("         US: " + "MAX");
+      }
+      else{
+        System.out.println("         US: " + UltrasonicPoller.getDistance());
+      }
+      
       // throttle the OdometryDisplay
       displayEnd = System.currentTimeMillis();
       if (displayEnd - displayStart < DISPLAY_PERIOD) {
