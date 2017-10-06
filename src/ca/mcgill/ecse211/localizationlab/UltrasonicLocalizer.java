@@ -1,6 +1,7 @@
 package ca.mcgill.ecse211.localizationlab;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class UltrasonicLocalizer extends Thread {
@@ -10,6 +11,8 @@ public class UltrasonicLocalizer extends Thread {
   private static int fallingEdge = 38;
   private static int risingEdge = 42;
   private static final int FILTER_OUT = 10;
+  private double avgHeading;
+  private double dTheta;
   
   
   EV3LargeRegulatedMotor leftMotor;
@@ -23,11 +26,13 @@ public class UltrasonicLocalizer extends Thread {
   private static float[] localizationScan;
   private double heading1;
   private double heading2;
-  private int filterControl;
   private int distance;
   
   public UltrasonicLocalizer(Odometer odo, UltrasonicPoller usPoller, float[] localizationScan, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double leftRadius, double rightRadius, double width){
-    this.odometer = odo;
+	for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {leftMotor, rightMotor}) {
+	      motor.stop();
+	      motor.setAcceleration(3000);}
+	this.odometer = odo;
     this.usPoller = usPoller;
     this.localizationScan = localizationScan;
     this.leftMotor = leftMotor;
@@ -38,7 +43,6 @@ public class UltrasonicLocalizer extends Thread {
   }
   
   public void run(){
-    
     if(mode == 1){    //Falling Edge Mode
       this.fallingEdge();  
     }
@@ -48,21 +52,71 @@ public class UltrasonicLocalizer extends Thread {
   }
 
   public void fallingEdge(){
-    
-    this.filterControl = 0;
-    
-    
+	  
+	try {
+	  Thread.sleep(2000);
+	} catch (InterruptedException e) {      } 
+	  
     leftMotor.setSpeed(ROTATE_SPEED);    //Sets the motors to rotation speed  
     rightMotor.setSpeed(ROTATE_SPEED);
     
-    leftMotor.forward();
-    rightMotor.backward();
     
-    while(true){
+    while( UltrasonicPoller.getDistance() < fallingEdge) {
     
-      distance = UltrasonicPoller.getDistance();
-      
-      if (distance >= 255 && filterControl < FILTER_OUT) {
+    	leftMotor.forward();                 //Rotates clockwise till it sees nothing
+        rightMotor.backward();  
+    }
+    Sound.beep();
+    
+    while( UltrasonicPoller.getDistance() >= fallingEdge) {
+        
+    	leftMotor.forward();                 //Rotates clockwise till it sees the bottom wall
+        rightMotor.backward();  
+    }
+    Sound.beep();
+    heading1 = odometer.getTheta();
+    
+    rightMotor.stop(true);
+    leftMotor.stop(true);
+    
+    try {
+        Thread.sleep(1500);
+      } catch (InterruptedException e) {      } 
+    
+    
+    while( UltrasonicPoller.getDistance() < fallingEdge) {
+    	
+    	leftMotor.backward();                //Rotates counterclockwise till it sees nothing
+    	rightMotor.forward();
+    }
+    Sound.beep();
+    
+    while( UltrasonicPoller.getDistance() >= fallingEdge) {
+    	leftMotor.backward();                 //Rotates counterclockwise till it sees the left wall
+    	rightMotor.forward();
+    }
+    Sound.beep();
+    heading2 = odometer.getTheta();
+    
+    leftMotor.stop(true);
+    rightMotor.stop(true);
+    
+    try {
+        Thread.sleep(1500);
+      } catch (InterruptedException e) {      } 
+    
+    if(heading1 > heading2) heading1 -= 360;
+    
+    avgHeading = (heading1 + heading2)/2;
+    dTheta = heading2 - avgHeading;
+    
+    leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
+    rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
+    
+    odometer.setTheta(0.0);
+    Sound.twoBeeps();
+    
+      /*if (distance >= 255 && filterControl < FILTER_OUT) {
         // bad value, do not set the distance var, however do increment the
         // filter value
         filterControl++;
@@ -75,22 +129,20 @@ public class UltrasonicLocalizer extends Thread {
         // distance alone.
         filterControl = 0;
         this.distance = (int) distance;
-      }
+      }*/
 
-      if(distance < fallingEdge){
+      /*if(distance < fallingEdge){
         heading1 = odometer.getTheta();
+        break;
       }
-      break;
+      
     }
     
     leftMotor.backward();
-    rightMotor.forward();
+    rightMotor.forward();*/
     
     
-    while(true){
-      
-      
-      distance = UltrasonicPoller.getDistance();
+    /*while(true){
       
       if (distance >= 255 && filterControl < FILTER_OUT) {
         // bad value, do not set the distance var, however do increment the
@@ -109,8 +161,8 @@ public class UltrasonicLocalizer extends Thread {
       
       if(distance < fallingEdge){
         heading2 = odometer.getTheta();
+        break;
       }
-      break;
     }
     
     leftMotor.forward();
@@ -123,7 +175,7 @@ public class UltrasonicLocalizer extends Thread {
     leftMotor.stop();
     rightMotor.stop();
     
-    System.out.print("Done");
+    System.out.print("Done");*/
       
   }
     

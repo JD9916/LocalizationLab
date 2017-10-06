@@ -16,11 +16,16 @@ public class UltrasonicPoller extends Thread {
   private static float[] localizationScan;
   private static int distance;			   //The distance registered by the sensor
   private int counter = 0;
+  private static int output;
+  private static final int FILTER_OUT = 10;
+  private static int filterControl;
+  private static int lastDistance = 50;
 
   public UltrasonicPoller(SampleProvider us, float[] usData, float[] localizationScan) { //Constructor for this class
     this.us = us;						   
     this.usData = usData;
     this.localizationScan = localizationScan;
+    this.filterControl = 0;
   }
 
   /*
@@ -67,7 +72,25 @@ public class UltrasonicPoller extends Thread {
   }
   
   public static int getDistance(){			//Getter for distance (used in navigation class)
-	  return distance;
+	  
+	  
+	  if (distance > 255 && filterControl < FILTER_OUT) {
+		// bad value, do not set the distance var, however do increment the
+	    // filter value
+		filterControl ++;
+		output = lastDistance;
+	  } else if (distance > 255){
+		// We have repeated large values, so there must actually be nothing
+	    // there: leave the distance alone
+		output = distance; 
+	  } else {
+		// distance went below 255: reset filter and leave
+	    // distance alone.
+        filterControl = 0;
+		output = distance;
+		}
+	  	lastDistance = output;
+		return output;
   }
 
 }

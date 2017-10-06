@@ -1,5 +1,6 @@
 package ca.mcgill.ecse211.localizationlab;
 
+
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
@@ -42,17 +43,9 @@ public class LocalizationLab {
     UltrasonicPoller usPoller = new UltrasonicPoller(usDistance,usData, localizationScan);
     usPoller.start();
     
-    UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(odometer,usPoller, localizationScan, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK );
+    final UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(odometer,usPoller, localizationScan, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK );
     
-		  
-    //Create an instance of the Nagivation class, used to guide the robot.
-    final Navigation navigator = 
-    new Navigation(odometer, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK );
-    (new Thread() {
-      public void run() {  
-	  }
-    }).start();
-    do { 
+	do { 
       t.clear();	                           // Clear the display.
       t.drawString("        |        ", 0, 0);  // Prompt user for input
       t.drawString(" Falling| Rising ", 0, 1);
@@ -63,13 +56,11 @@ public class LocalizationLab {
       buttonChoice = Button.waitForAnyPress(); //Wait for user input
 	} while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT );
       if(buttonChoice == Button.ID_LEFT){
-	    //odometer.start();                  
-	    //odometryDisplay.start();
-        t.clear();
+    	odometer.start();                  
+	    odometryDisplay.start();
 	    usLocalizer.setMode(1);
 	    usLocalizer.start();
-	    
-	    } 
+      }
       if(buttonChoice == Button.ID_RIGHT){
         odometer.start();                  
         odometryDisplay.start();
