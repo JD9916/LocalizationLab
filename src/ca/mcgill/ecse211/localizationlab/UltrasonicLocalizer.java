@@ -8,11 +8,12 @@ public class UltrasonicLocalizer extends Thread {
 
   private int mode;
   private static final int ROTATE_SPEED = 100; 
-  private static int fallingEdge = 38;
+  private static int fallingEdge = 30;
   private static int risingEdge = 42;
   private static final int FILTER_OUT = 10;
   private double avgHeading;
   private double dTheta;
+  private static final int NOISE = 1;
   
   
   EV3LargeRegulatedMotor leftMotor;
@@ -57,65 +58,81 @@ public class UltrasonicLocalizer extends Thread {
 	  Thread.sleep(2000);
 	} catch (InterruptedException e) {      } 
 	  
+	leftMotor.setAcceleration(250);
+	rightMotor.setAcceleration(250);
     leftMotor.setSpeed(ROTATE_SPEED);    //Sets the motors to rotation speed  
     rightMotor.setSpeed(ROTATE_SPEED);
     
     
-    while( UltrasonicPoller.getDistance() < fallingEdge) {
+    while( UltrasonicPoller.getDistance() < fallingEdge + NOISE) {
     
     	leftMotor.forward();                 //Rotates clockwise till it sees nothing
         rightMotor.backward();  
     }
     Sound.beep();
     
-    while( UltrasonicPoller.getDistance() >= fallingEdge) {
+    while( UltrasonicPoller.getDistance() >= fallingEdge - NOISE) {
         
     	leftMotor.forward();                 //Rotates clockwise till it sees the bottom wall
         rightMotor.backward();  
     }
-    Sound.beep();
-    heading1 = odometer.getTheta();
-    
     rightMotor.stop(true);
     leftMotor.stop(true);
+    
+    Sound.beep();
+    heading1 = odometer.getTheta();
+    System.out.println("        " + heading1);
+    
+    
     
     try {
         Thread.sleep(1500);
       } catch (InterruptedException e) {      } 
     
     
-    while( UltrasonicPoller.getDistance() < fallingEdge) {
+    while( UltrasonicPoller.getDistance() < fallingEdge + NOISE) {
     	
     	leftMotor.backward();                //Rotates counterclockwise till it sees nothing
     	rightMotor.forward();
     }
     Sound.beep();
     
-    while( UltrasonicPoller.getDistance() >= fallingEdge) {
+    while( UltrasonicPoller.getDistance() >= fallingEdge - NOISE) {
     	leftMotor.backward();                 //Rotates counterclockwise till it sees the left wall
     	rightMotor.forward();
     }
-    Sound.beep();
-    heading2 = odometer.getTheta();
-    
     leftMotor.stop(true);
     rightMotor.stop(true);
+    
+    Sound.beep();
+    heading2 = odometer.getTheta();
+    System.out.println("        " + heading2);
+    
     
     try {
         Thread.sleep(1500);
       } catch (InterruptedException e) {      } 
     
-    avgHeading = (heading1 + heading2)/2;
-    
     if(heading1 > heading2) {
+    	heading1 -= 360;
+    }
+    
+    avgHeading = (heading1 + heading2)/2;
+    dTheta = heading2 - avgHeading;
+    
+    /*if(heading1 < heading2) {
     	dTheta = 225 - avgHeading;
     }
     else {
     	dTheta = 45 - avgHeading;
-    }
+    	dTheta += 360;
+    }*/
     
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
+    
+    leftMotor.stop(true);
+    rightMotor.stop(true);
     
     odometer.setTheta(0.0);
     Sound.twoBeeps();
