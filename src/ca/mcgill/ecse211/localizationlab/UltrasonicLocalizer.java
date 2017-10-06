@@ -69,9 +69,9 @@ public class UltrasonicLocalizer extends Thread {
     	leftMotor.forward();                 //Rotates clockwise till it sees nothing
         rightMotor.backward();  
     }
-    Sound.beep();
+    //Sound.beep();
     
-    while( UltrasonicPoller.getDistance() >= fallingEdge - NOISE) {
+    while( UltrasonicPoller.getDistance() > fallingEdge - NOISE) {
         
     	leftMotor.forward();                 //Rotates clockwise till it sees the bottom wall
         rightMotor.backward();  
@@ -82,7 +82,6 @@ public class UltrasonicLocalizer extends Thread {
     Sound.beep();
     heading1 = odometer.getTheta();
     System.out.println("        " + heading1);
-    
     
     
     try {
@@ -97,7 +96,7 @@ public class UltrasonicLocalizer extends Thread {
     }
     Sound.beep();
     
-    while( UltrasonicPoller.getDistance() >= fallingEdge - NOISE) {
+    while( UltrasonicPoller.getDistance() > fallingEdge - NOISE) {
     	leftMotor.backward();                 //Rotates counterclockwise till it sees the left wall
     	rightMotor.forward();
     }
@@ -205,7 +204,63 @@ public class UltrasonicLocalizer extends Thread {
   
   
   public void risingEdge(){
+	  
+	  try {
+		  Thread.sleep(2000);
+		} catch (InterruptedException e) {      } 
+		  
+		leftMotor.setAcceleration(250);
+		rightMotor.setAcceleration(250);
+	    leftMotor.setSpeed(ROTATE_SPEED);    //Sets the motors to rotation speed  
+	    rightMotor.setSpeed(ROTATE_SPEED);
     
+	    while( UltrasonicPoller.getDistance() > risingEdge - NOISE) {   
+	    	leftMotor.forward();             //Rotates clockwise till it sees the bottom wall
+	        rightMotor.backward();  
+	    }
+	    while( UltrasonicPoller.getDistance() < risingEdge + NOISE) {
+	        
+	    	leftMotor.forward();             //Rotates clockwise till it sees nothing
+	        rightMotor.backward();  
+	    }
+	    
+	    rightMotor.stop(true);
+	    leftMotor.stop(true);
+	    
+	    Sound.beep();
+	    heading1 = odometer.getTheta();
+	    System.out.println("        " + heading1);
+	    
+	    try {
+	        Thread.sleep(1500);
+	      } catch (InterruptedException e) {      } 
+	    
+	    while( UltrasonicPoller.getDistance() > risingEdge - NOISE) {
+	    	
+	    	leftMotor.backward();                //Rotates counterclockwise till it sees the left wall
+	    	rightMotor.forward();
+	    }
+	    Sound.beep();
+	    
+	    while( UltrasonicPoller.getDistance() < risingEdge + NOISE) {
+	    	leftMotor.backward();                 //Rotates counterclockwise till it sees nothing
+	    	rightMotor.forward();
+	    }
+	    leftMotor.stop(true);
+	    rightMotor.stop(true);
+	    
+	    Sound.beep();
+	    heading2 = odometer.getTheta();
+	    System.out.println("        " + heading2);
+	    
+	    
+	    try {
+	        Thread.sleep(1500);
+	      } catch (InterruptedException e) {      } 
+	    
+	    
+  
+  
   }
   
   public void setMode(int mode){
