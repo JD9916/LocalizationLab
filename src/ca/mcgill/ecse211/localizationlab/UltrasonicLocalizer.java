@@ -105,10 +105,14 @@ public class UltrasonicLocalizer extends Thread {
         Thread.sleep(1500);
       } catch (InterruptedException e) {      } 
     
-    if(heading1 > heading2) heading1 -= 360;
-    
     avgHeading = (heading1 + heading2)/2;
-    dTheta = heading2 - avgHeading;
+    
+    if(heading1 > heading2) {
+    	dTheta = 225 - avgHeading;
+    }
+    else {
+    	dTheta = 45 - avgHeading;
+    }
     
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
