@@ -80,7 +80,7 @@ public class UltrasonicLocalizer extends Thread {
     rightMotor.stop(true);
     leftMotor.stop(true);
     
-    //Sound.beep();
+    Sound.beep();
     heading1 = odometer.getTheta();
 
     try {
@@ -101,7 +101,7 @@ public class UltrasonicLocalizer extends Thread {
     leftMotor.stop(true);
     rightMotor.stop(true);
     
-    //Sound.beep();
+    Sound.beep();
     heading2 = odometer.getTheta();
  
     
@@ -114,7 +114,7 @@ public class UltrasonicLocalizer extends Thread {
     }
     
     avgHeading = (heading1 + heading2)/2;
-    dTheta = heading2 - avgHeading;
+    dTheta = heading2 - avgHeading -10;
 
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
@@ -159,7 +159,7 @@ public class UltrasonicLocalizer extends Thread {
 	    rightMotor.stop(true);
 	    leftMotor.stop(true);
 	    
-	    //Sound.beep();
+	    Sound.beep();
 	    heading1 = odometer.getTheta();
 	    
 	    try {
@@ -180,7 +180,7 @@ public class UltrasonicLocalizer extends Thread {
 	    leftMotor.stop(true);
 	    rightMotor.stop(true);
 	    
-	    //Sound.beep();
+	    Sound.beep();
 	    heading2 = odometer.getTheta();
 	    System.out.println("        " + heading2);
 	    
@@ -190,12 +190,12 @@ public class UltrasonicLocalizer extends Thread {
 	      } catch (InterruptedException e) {      } 
 	    
 	    
-	    if(heading1 > heading2) {
-	        heading1 -= 360;
+	    if(heading1 < heading2) {
+	        heading2 -= 360;
 	    }
 	    
 	    avgHeading = (heading1 + heading2)/2;
-	    dTheta = heading2 - avgHeading;
+	    dTheta = heading1 - avgHeading;
 
 	    leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
 	    rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);

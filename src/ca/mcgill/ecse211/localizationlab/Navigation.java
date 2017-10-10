@@ -20,7 +20,7 @@ public class Navigation extends Thread{
   private Odometer odometer;
   private boolean navigating = false;   //Initially, the robot is not navigating
   public double x, y;                   //The desired x and y coordinates of the next checkpoint.
-  private double points[][] = {{30.48,30.48},{0,60.96},{60.96, 60.96},{60.96, 30.48},{30.48, 0.0}};;
+  private double points[][] = {{0.0,0.0}};;
 	
    public Navigation(Odometer odo, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double leftRadius, double rightRadius, double width) {
      //Here, objects instantiated in NavigationLab are passed to the Navigation Class.
@@ -168,7 +168,7 @@ public class Navigation extends Thread{
       }
       return stop;
 	  }
-	
+
 	private static int convertAngle(double radius, double width, double angle) {
 	  //Given wheel radius (cm), wheel base (cm), and desired turn angle (degrees)
 	  //converts to the angle the wheels need to drive.

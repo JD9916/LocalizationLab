@@ -49,6 +49,8 @@ public class LocalizationLab {
     
     OdometryCorrection odometryCorrection = new OdometryCorrection(odometer, csPoller);
     
+    Navigation navigator = new Navigation(odometer, leftMotor, rightMotor, WHEEL_RADIUS, WHEEL_RADIUS, TRACK);
+    
     float localizationScan[] = new float[50];
     
 	//Create an instance of the US Poller, to take samples from the US sensor in a thread.	  
@@ -56,7 +58,7 @@ public class LocalizationLab {
     usPoller.start();
     
     final UltrasonicLocalizer usLocalizer = new UltrasonicLocalizer(odometer,usPoller, localizationScan, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK );
-    final LightLocalizer lightLocalizer = new LightLocalizer(odometer,usPoller, csPoller, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK);
+    final LightLocalizer lightLocalizer = new LightLocalizer(odometer,navigator,usPoller, csPoller, leftMotor, rightMotor,WHEEL_RADIUS, WHEEL_RADIUS, TRACK);
     
 	do { 
       t.clear();	                           // Clear the display.

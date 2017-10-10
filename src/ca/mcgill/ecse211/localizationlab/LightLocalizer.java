@@ -18,6 +18,7 @@ public class LightLocalizer extends Thread {
   
   
   private Odometer odometer;
+  private Navigation navigator;
   private UltrasonicPoller usPoller;
   private ColorSensorPoller csPoller;
   EV3LargeRegulatedMotor leftMotor;
@@ -29,11 +30,12 @@ public class LightLocalizer extends Thread {
   
   
   
-  public LightLocalizer(Odometer odo, UltrasonicPoller usPoller, ColorSensorPoller csPoller, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double leftRadius, double rightRadius, double width){
+  public LightLocalizer(Odometer odo, Navigation navigator, UltrasonicPoller usPoller, ColorSensorPoller csPoller, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double leftRadius, double rightRadius, double width){
     for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {leftMotor, rightMotor}) {
           motor.stop();
           motor.setAcceleration(3000);}
     this.odometer = odo;
+    this.navigator = navigator;
     this.usPoller = usPoller;
     this.csPoller = csPoller;
     this.leftMotor = leftMotor;
@@ -50,6 +52,11 @@ public class LightLocalizer extends Thread {
     scan();
 
     calculate();
+    
+    //navigator.start();
+    
+    //navigator.turnTo((-1)*this.odometer.getTheta());
+    
   }
   
   
@@ -164,6 +171,8 @@ public class LightLocalizer extends Thread {
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
     
     odometer.setTheta(0.0);
+    
+    Sound.twoBeeps();
     
   }
   
