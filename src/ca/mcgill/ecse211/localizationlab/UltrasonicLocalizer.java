@@ -14,6 +14,7 @@ public class UltrasonicLocalizer extends Thread {
   private double avgHeading;
   private double dTheta;
   private static final int NOISE = 1;
+  private boolean isComplete = false;
   
   
   EV3LargeRegulatedMotor leftMotor;
@@ -69,7 +70,7 @@ public class UltrasonicLocalizer extends Thread {
     	leftMotor.forward();                 //Rotates clockwise till it sees nothing
         rightMotor.backward();  
     }
-    //Sound.beep();
+    
     
     while( UltrasonicPoller.getDistance() > fallingEdge - NOISE) {
         
@@ -79,11 +80,9 @@ public class UltrasonicLocalizer extends Thread {
     rightMotor.stop(true);
     leftMotor.stop(true);
     
-    Sound.beep();
+    //Sound.beep();
     heading1 = odometer.getTheta();
-    System.out.println("        " + heading1);
-    
-    
+
     try {
         Thread.sleep(1500);
       } catch (InterruptedException e) {      } 
@@ -94,7 +93,6 @@ public class UltrasonicLocalizer extends Thread {
     	leftMotor.backward();                //Rotates counterclockwise till it sees nothing
     	rightMotor.forward();
     }
-    Sound.beep();
     
     while( UltrasonicPoller.getDistance() > fallingEdge - NOISE) {
     	leftMotor.backward();                 //Rotates counterclockwise till it sees the left wall
@@ -103,10 +101,9 @@ public class UltrasonicLocalizer extends Thread {
     leftMotor.stop(true);
     rightMotor.stop(true);
     
-    Sound.beep();
+    //Sound.beep();
     heading2 = odometer.getTheta();
-    System.out.println("        " + heading2);
-    
+ 
     
     try {
         Thread.sleep(1500);
@@ -118,15 +115,7 @@ public class UltrasonicLocalizer extends Thread {
     
     avgHeading = (heading1 + heading2)/2;
     dTheta = heading2 - avgHeading;
-    
-    /*if(heading1 < heading2) {
-    	dTheta = 225 - avgHeading;
-    }
-    else {
-    	dTheta = 45 - avgHeading;
-    	dTheta += 360;
-    }*/
-    
+
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
     
@@ -136,67 +125,8 @@ public class UltrasonicLocalizer extends Thread {
     odometer.setTheta(0.0);
     Sound.twoBeeps();
     
-      /*if (distance >= 255 && filterControl < FILTER_OUT) {
-        // bad value, do not set the distance var, however do increment the
-        // filter value
-        filterControl++;
-      } else if (distance >= 255) {
-        // We have repeated large values, so there must actually be nothing
-        // there: leave the distance alone
-          this.distance = (int) distance;
-      } else {
-        // distance went below 255: reset filter and leave
-        // distance alone.
-        filterControl = 0;
-        this.distance = (int) distance;
-      }*/
-
-      /*if(distance < fallingEdge){
-        heading1 = odometer.getTheta();
-        break;
-      }
-      
-    }
-    
-    leftMotor.backward();
-    rightMotor.forward();*/
-    
-    
-    /*while(true){
-      
-      if (distance >= 255 && filterControl < FILTER_OUT) {
-        // bad value, do not set the distance var, however do increment the
-        // filter value
-        filterControl++;
-      } else if (distance >= 255) {
-        // We have repeated large values, so there must actually be nothing
-        // there: leave the distance alone
-          this.distance = (int) distance;
-      } else {
-        // distance went below 255: reset filter and leave
-        // distance alone.
-        filterControl = 0;
-        this.distance = (int) distance;
-      }
-      
-      if(distance < fallingEdge){
-        heading2 = odometer.getTheta();
-        break;
-      }
-    }
-    
-    leftMotor.forward();
-    rightMotor.backward();
-    
-    while(odometer.getTheta() < Math.abs(heading1-heading2) - 1 || odometer.getTheta() > Math.abs(heading1-heading2) + 1){
-      //do nothing
-    }
-    
-    leftMotor.stop();
-    rightMotor.stop();
-    
-    System.out.print("Done");*/
-      
+    this.isComplete = true;
+     
   }
     
     
@@ -214,42 +144,43 @@ public class UltrasonicLocalizer extends Thread {
 	    leftMotor.setSpeed(ROTATE_SPEED);    //Sets the motors to rotation speed  
 	    rightMotor.setSpeed(ROTATE_SPEED);
     
+	    //If the robot has been placed outward, turn clockwise until the bottom wall is seen
 	    while( UltrasonicPoller.getDistance() > risingEdge - NOISE) {   
 	    	leftMotor.forward();             //Rotates clockwise till it sees the bottom wall
 	        rightMotor.backward();  
 	    }
+	    
+	    //Rotates clockwise till it sees nothing
 	    while( UltrasonicPoller.getDistance() < risingEdge + NOISE) {
-	        
-	    	leftMotor.forward();             //Rotates clockwise till it sees nothing
+	    	leftMotor.forward();             
 	        rightMotor.backward();  
 	    }
 	    
 	    rightMotor.stop(true);
 	    leftMotor.stop(true);
 	    
-	    Sound.beep();
+	    //Sound.beep();
 	    heading1 = odometer.getTheta();
-	    System.out.println("        " + heading1);
 	    
 	    try {
 	        Thread.sleep(1500);
 	      } catch (InterruptedException e) {      } 
 	    
-	    while( UltrasonicPoller.getDistance() > risingEdge - NOISE) {
-	    	
-	    	leftMotor.backward();                //Rotates counterclockwise till it sees the left wall
+	    //Rotates counterclockwise till it sees the left wall
+	    while( UltrasonicPoller.getDistance() > risingEdge + NOISE) {
+	    	leftMotor.backward();                
 	    	rightMotor.forward();
 	    }
-	    Sound.beep();
 	    
-	    while( UltrasonicPoller.getDistance() < risingEdge + NOISE) {
-	    	leftMotor.backward();                 //Rotates counterclockwise till it sees nothing
+	    //Rotates counterclockwise till it sees nothing
+	    while( UltrasonicPoller.getDistance() < risingEdge - NOISE) {
+	    	leftMotor.backward();                 
 	    	rightMotor.forward();
 	    }
 	    leftMotor.stop(true);
 	    rightMotor.stop(true);
 	    
-	    Sound.beep();
+	    //Sound.beep();
 	    heading2 = odometer.getTheta();
 	    System.out.println("        " + heading2);
 	    
@@ -259,7 +190,23 @@ public class UltrasonicLocalizer extends Thread {
 	      } catch (InterruptedException e) {      } 
 	    
 	    
-  
+	    if(heading1 > heading2) {
+	        heading1 -= 360;
+	    }
+	    
+	    avgHeading = (heading1 + heading2)/2;
+	    dTheta = heading2 - avgHeading;
+
+	    leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
+	    rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
+	    
+	    leftMotor.stop(true);
+	    rightMotor.stop(true);
+	    
+	    odometer.setTheta(0.0);
+	    Sound.twoBeeps();
+	    
+	    this.isComplete = true;
   
   }
   
@@ -276,6 +223,10 @@ public class UltrasonicLocalizer extends Thread {
     //Given the distance (cm) to travel and the wheel radius (cm), 
     //converts to amount of wheel rotation needed.
     return (int) ((180.0 * distance) / (Math.PI * radius));
+  }
+  
+  public boolean isComplete(){
+    return this.isComplete;
   }
   
  

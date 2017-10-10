@@ -21,7 +21,7 @@ public class UltrasonicPoller extends Thread {
   private static int filterControl;
   private static int lastDistance = 50;
 
-  public UltrasonicPoller(SampleProvider us, float[] usData, float[] localizationScan) { //Constructor for this class
+  public UltrasonicPoller(SampleProvider us, float[] usData) { //Constructor for this class
     this.us = us;						   
     this.usData = usData;
     this.localizationScan = localizationScan;
