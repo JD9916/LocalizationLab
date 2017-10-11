@@ -58,8 +58,8 @@ public class Navigation extends Thread{
 	  }else if(toTheta < -180){
 	    toTheta += 360.0;
 	  }
-      if((this.odometer.getTheta() <= (this.getAngle(x, y) -1)) 
-        || (this.odometer.getTheta() >= (this.getAngle(x, y) + 1)) ){
+      if((this.odometer.getTheta() <= (this.getAngle(x, y) -0.5)) 
+        || (this.odometer.getTheta() >= (this.getAngle(x, y) + 0.5)) ){
       //checks to see if the robot is not facing the right way
         turnTo(toTheta);            //Corrects the bot's orientation
 	  }
@@ -126,6 +126,9 @@ public class Navigation extends Thread{
 	    rightMotor.setSpeed(FORWARD_SPEED);
 	    leftMotor.forward();
 	    rightMotor.forward();
+	    leftMotor.rotate(convertDistance(LocalizationLab.WHEEL_RADIUS, Math.sqrt(Math.pow(odometer.getX() - x,2) + Math.pow(odometer.getY() - y,2))), true);
+	    rightMotor.rotate(convertDistance(LocalizationLab.WHEEL_RADIUS, Math.sqrt(Math.pow(odometer.getX() - x,2) + Math.pow(odometer.getY() - y,2))), false);
+	   
       }	
 	  Sound.beep();      //Make a beeping sound
 	}

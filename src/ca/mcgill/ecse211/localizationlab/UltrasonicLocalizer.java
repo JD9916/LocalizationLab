@@ -7,10 +7,9 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 public class UltrasonicLocalizer extends Thread {
 
   private int mode;
-  private static final int ROTATE_SPEED = 100; 
+  private static final int ROTATE_SPEED = 100;
   private static int fallingEdge = 38;
   private static int risingEdge = 45;
-  private static final int FILTER_OUT = 10;
   private double avgHeading;
   private double dTheta;
   private static final int NOISE = 5;
@@ -33,7 +32,7 @@ public class UltrasonicLocalizer extends Thread {
   public UltrasonicLocalizer(Odometer odo, UltrasonicPoller usPoller, float[] localizationScan, EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double leftRadius, double rightRadius, double width){
 	for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] {leftMotor, rightMotor}) {
 	      motor.stop();
-	      motor.setAcceleration(3000);}
+	      motor.setAcceleration(300);}
 	this.odometer = odo;
     this.usPoller = usPoller;
     this.localizationScan = localizationScan;
@@ -114,7 +113,7 @@ public class UltrasonicLocalizer extends Thread {
     }
     
     avgHeading = (heading1 + heading2)/2;
-    dTheta = heading2 - avgHeading - 30;
+    dTheta = heading2 - avgHeading - 15;
 
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);

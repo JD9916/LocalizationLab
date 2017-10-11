@@ -15,7 +15,7 @@ import lejos.robotics.SampleProvider;
 public class LocalizationLab {
 
   public static final double WHEEL_RADIUS = 2.1;            //Wheel radius (cm)
-  public static final double TRACK = 14.6;                  //Wheel base length (cm)
+  public static final double TRACK = 14.4;                  //Wheel base length (cm)
   
   //Setup right and left motors
   private static final EV3LargeRegulatedMotor leftMotor =   //Left motor uses port A
