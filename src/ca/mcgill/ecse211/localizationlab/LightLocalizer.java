@@ -6,7 +6,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 public class LightLocalizer extends Thread {
   
   private static final int ROTATE_SPEED = 100; 
-  private static double colorSensorDistance = 14.0; //How far the color sensor is from the center of rotation
+  private static double colorSensorDistance = 14.4; //How far the color sensor is from the center of rotation
   
   private double thetaY; //The angle that subtends the arc connecting the intersections of the light sensor's path with the y axis
   private double thetaY1;
@@ -46,14 +46,41 @@ public class LightLocalizer extends Thread {
   }
   
   public void run(){
+	  
+	leftMotor.setAcceleration(300);
+	rightMotor.setAcceleration(300);
     
     positionRobot();
     
+    leftMotor.stop(true);
+    rightMotor.stop(true);
+    try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {      } 
+    
     scan();
+    
+    leftMotor.stop(true);
+    rightMotor.stop(true);
+    try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {      } 
 
     calculate();
+    try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {      } 
     
-    //navigator.start();
+    navigator.travelTo(0,0);
+    leftMotor.stop(true);
+    rightMotor.stop(true);
+    
+    try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {      }
+    //leftMotor.stop(true);
+    //rightMotor.stop(true);
+    navigator.turnTo(0 - odometer.getTheta()-10);
     
     //navigator.turnTo((-1)*this.odometer.getTheta());
     
@@ -70,7 +97,9 @@ public class LightLocalizer extends Thread {
     //Sound.beep();
     leftMotor.stop(true);
     rightMotor.stop(true);
-    
+    try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {      } 
     leftMotor.backward();
     rightMotor.backward();
     try {
@@ -90,8 +119,8 @@ public class LightLocalizer extends Thread {
       Thread.sleep(1500);
     } catch (InterruptedException e) {      } 
     
-    leftMotor.forward();
     rightMotor.forward();
+    leftMotor.forward();
     
     while(csPoller.getColor() > 50){
       //wait
@@ -119,24 +148,18 @@ public class LightLocalizer extends Thread {
       leftMotor.forward();
       rightMotor.backward();
     }
-    leftMotor.stop(true);
-    rightMotor.stop(true);
     this.thetaY1 = odometer.getTheta();
     Sound.beep();
     while(csPoller.getColor() > 50){
       leftMotor.forward();
       rightMotor.backward();
     }
-    leftMotor.stop(true);
-    rightMotor.stop(true);
     this.thetaX1 = odometer.getTheta();
     Sound.beep();
     while(csPoller.getColor() > 50){
       leftMotor.forward();
       rightMotor.backward();
     }
-    leftMotor.stop(true);
-    rightMotor.stop(true);
     this.thetaY2 = odometer.getTheta();
     Sound.beep();
     while(csPoller.getColor() > 50){
@@ -146,18 +169,18 @@ public class LightLocalizer extends Thread {
     leftMotor.stop(true);
     rightMotor.stop(true);
     this.thetaX2 = odometer.getTheta();
-    Sound.beep();
+    Sound.twoBeeps();
     
     
   }
   
   private void calculate(){
-    this.thetaY = Math.abs(this.thetaY1-this.thetaY2);
-    this.thetaX = Math.abs(this.thetaX1-this.thetaX2);
+    this.thetaY = Math.abs(this.thetaY2-this.thetaY1);
+    this.thetaX = Math.abs(this.thetaX2-this.thetaX1);
     
-    odometer.setX((-1)*(colorSensorDistance)*Math.cos((this.thetaY/180)*Math.PI));
-    odometer.setY((-1)*(colorSensorDistance)*Math.cos((this.thetaX/180)*Math.PI));
-
+    odometer.setX((-1)*(colorSensorDistance)*Math.cos((this.thetaY/360)*Math.PI));
+    odometer.setY((-1)*(colorSensorDistance)*Math.cos((this.thetaX/360)*Math.PI));
+    /*
     if(thetaY1 > 360){
       thetaY1 = thetaY1 - 360;
     }
@@ -171,9 +194,8 @@ public class LightLocalizer extends Thread {
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
     
     odometer.setTheta(0.0);
-    
-    Sound.twoBeeps();
-    
+    */
+ 
   }
   
   

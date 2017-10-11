@@ -44,8 +44,8 @@ public class Navigation extends Thread{
 	  this.travelTo(p[0], p[1]);   //Travels to the next point
 	  this.isNavigating = false;   //The robot has finished navigating
       }
-    leftMotor.stop();              //Stops motors after end is reached.
-    rightMotor.stop();
+    leftMotor.stop(true);              //Stops motors after end is reached.
+    rightMotor.stop(true);
 	}
 
   public void travelTo(double x, double y) {
@@ -79,7 +79,7 @@ public class Navigation extends Thread{
 		  //4. Drive back behind the object
 		  
 		  
-		  while (1==1){
+		  /*while (1==1){
 		    beforeTheta = odometer.getTheta();     //Get the robot's initial orientation
 		    while(UltrasonicPoller.getDistance() < 40){
 		      //Here, the robot will turn until it sees no wall
@@ -119,7 +119,7 @@ public class Navigation extends Thread{
               turnTo(toTheta);
             }
             break;
-		  }	
+		  }*/	
 	    }
 	    //If facing the right angle, and no object is detected, move forward.
 		leftMotor.setSpeed(FORWARD_SPEED);
@@ -141,7 +141,7 @@ public class Navigation extends Thread{
       this.navigating = false;              //Turns navigation mode off
     }
 	
-	private double getAngle(double x, double y){
+	public double getAngle(double x, double y){
       double theta;
       //Calculates the angle the robot must orient itself in to face the checkpoint.
       //This is done using the robot's current position, the checkpoint position,

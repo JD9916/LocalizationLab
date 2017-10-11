@@ -8,12 +8,12 @@ public class UltrasonicLocalizer extends Thread {
 
   private int mode;
   private static final int ROTATE_SPEED = 100; 
-  private static int fallingEdge = 30;
-  private static int risingEdge = 42;
+  private static int fallingEdge = 38;
+  private static int risingEdge = 45;
   private static final int FILTER_OUT = 10;
   private double avgHeading;
   private double dTheta;
-  private static final int NOISE = 1;
+  private static final int NOISE = 5;
   private boolean isComplete = false;
   
   
@@ -59,8 +59,8 @@ public class UltrasonicLocalizer extends Thread {
 	  Thread.sleep(2000);
 	} catch (InterruptedException e) {      } 
 	  
-	leftMotor.setAcceleration(250);
-	rightMotor.setAcceleration(250);
+	leftMotor.setAcceleration(300);
+	rightMotor.setAcceleration(300);
     leftMotor.setSpeed(ROTATE_SPEED);    //Sets the motors to rotation speed  
     rightMotor.setSpeed(ROTATE_SPEED);
     
@@ -114,7 +114,7 @@ public class UltrasonicLocalizer extends Thread {
     }
     
     avgHeading = (heading1 + heading2)/2;
-    dTheta = heading2 - avgHeading -10;
+    dTheta = heading2 - avgHeading - 30;
 
     leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
     rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
@@ -167,13 +167,13 @@ public class UltrasonicLocalizer extends Thread {
 	      } catch (InterruptedException e) {      } 
 	    
 	    //Rotates counterclockwise till it sees the left wall
-	    while( UltrasonicPoller.getDistance() > risingEdge + NOISE) {
+	    while( UltrasonicPoller.getDistance() > risingEdge - NOISE) {
 	    	leftMotor.backward();                
 	    	rightMotor.forward();
 	    }
 	    
 	    //Rotates counterclockwise till it sees nothing
-	    while( UltrasonicPoller.getDistance() < risingEdge - NOISE) {
+	    while( UltrasonicPoller.getDistance() < risingEdge + NOISE) {
 	    	leftMotor.backward();                 
 	    	rightMotor.forward();
 	    }
@@ -182,7 +182,7 @@ public class UltrasonicLocalizer extends Thread {
 	    
 	    Sound.beep();
 	    heading2 = odometer.getTheta();
-	    System.out.println("        " + heading2);
+	    
 	    
 	    
 	    try {
@@ -195,10 +195,10 @@ public class UltrasonicLocalizer extends Thread {
 	    }
 	    
 	    avgHeading = (heading1 + heading2)/2;
-	    dTheta = heading1 - avgHeading;
+	    dTheta = heading1 - avgHeading + 50;
 
-	    leftMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
-	    rightMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
+	    leftMotor.rotate(-convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), true);
+	    rightMotor.rotate(convertAngle(LocalizationLab.WHEEL_RADIUS, LocalizationLab.TRACK , dTheta), false);
 	    
 	    leftMotor.stop(true);
 	    rightMotor.stop(true);
